@@ -3,207 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evolve Stage 2 - Vadvilág Generátor</title>
-    <!-- Google Fonts a sci-fi hatásért -->
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>Evolve - Interaktív Térkép</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-glow: #00ffcc; /* Szörny-nyomok fénye */
-            --accent-color: #ff3333; /* Vadász lézer színe */
+            --primary-glow: #00ffcc;
+            --accent-color: #ff3333;
             --bg-dark: #0a1118;
-            --bg-jungle: #162b22; /* Shear bolygó dzsungeles beütése */
         }
 
         body {
-            /* Színátmenetes háttér */
-            background: radial-gradient(circle at center, var(--bg-jungle) 0%, var(--bg-dark) 100%);
+            background-color: var(--bg-dark);
             color: #e2f0e8;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Share Tech Mono', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            justify-content: flex-start;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
-            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
         }
-
-        /* Hátteret díszítő animált "szkennelő" vonal */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: rgba(0, 255, 204, 0.15);
-            box-shadow: 0 0 15px var(--primary-glow);
-            animation: scanline 8s linear infinite;
-            z-index: 0;
-        }
-
-        @keyframes scanline {
-            0% { top: -10%; }
-            100% { top: 110%; }
-        }
-
-        .container {
-            /* Modern, holografikus adatlap (glassmorphism) */
-            background: rgba(15, 25, 20, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 40px;
-            border-radius: 4px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 255, 204, 0.05);
-            text-align: center;
-            max-width: 550px;
-            width: 90%;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Kis tech-sarkok a dizájn kedvéért */
-        .container::before, .container::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary-glow);
-            opacity: 0.5;
-        }
-        .container::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-        .container::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 
         h1 {
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--accent-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 2em;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
-        }
-
-        #creature-name {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 2.8em;
-            font-weight: 700;
-            margin: 20px 0;
             color: var(--primary-glow);
-            text-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
-            letter-spacing: 2px;
             text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+            margin-bottom: 20px;
         }
 
-        #creature-desc {
-            font-size: 1.3em;
-            margin-bottom: 25px;
-            line-height: 1.6;
-            min-height: 60px;
-            color: #b0c4b8;
-        }
-
-        #creature-buff {
-            font-size: 1.1em;
-            color: #ffd700;
-            margin-bottom: 35px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            border-left: 4px solid #ffd700;
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, transparent 100%);
-            padding: 12px 15px;
-            text-align: left;
-            display: inline-block;
-            width: 80%;
+        .controls {
+            margin-bottom: 20px;
+            z-index: 10;
         }
 
         button {
-            /* Vágott sarkú cyberpunk gomb stílus */
-            background: linear-gradient(45deg, transparent 10%, var(--accent-color) 10%);
-            color: white;
+            background: linear-gradient(45deg, rgba(0, 255, 204, 0.1) 10%, var(--primary-glow) 10%);
+            color: var(--bg-dark);
             border: none;
-            padding: 15px 40px;
+            padding: 12px 30px;
             font-size: 1.2em;
             font-weight: bold;
             font-family: 'Share Tech Mono', monospace;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-transform: uppercase;
-            box-shadow: 6px 0px 0px #00b38f;
-            outline: none;
+            box-shadow: 4px 0px 0px #00997a;
+            transition: all 0.2s ease;
         }
 
         button:hover {
-            background: linear-gradient(45deg, transparent 10%, #ff4d4d 10%);
-            box-shadow: 6px 0px 0px var(--primary-glow);
-            transform: translateX(-3px);
+            background: linear-gradient(45deg, rgba(0, 255, 204, 0.1) 10%, #33ffdb 10%);
+            transform: translateX(-2px);
         }
 
         button:active {
-            transform: translateX(3px);
-            box-shadow: 0px 0px 0px var(--primary-glow);
+            transform: translateX(2px);
+            box-shadow: 0px 0px 0px transparent;
         }
+
+        /* A térkép konténere */
+        #map-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px; /* A térkép maximális szélessége */
+            border: 2px solid rgba(0, 255, 204, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 204, 0.1);
+            overflow: hidden;
+        }
+
+        /* Maga a térkép kép */
+        #base-map {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* A ráhelyezett ikonok stílusa */
+        .food-icon {
+            position: absolute;
+            width: 35px; /* Ikon mérete - állíthatod ha túl nagy/kicsi */
+            height: 35px;
+            transform: translate(-50%, -50%); /* Hogy pontosan a koordinátán legyen a közepe */
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00aaff, inset 0 0 5px #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+            z-index: 5;
+        }
+
+        .food-icon:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Élőlény Generátor</h1>
-        <div id="creature-name">Rendszer Készenlétben</div>
-        <div id="creature-desc">Várakozás az indításra...</div>
-        <div id="creature-buff">Nincs aktív buff</div>
-        <button onclick="generateCreature()">Generálás Indítása</button>
+    <h1>Shear - Vadvilág Radar</h1>
+    
+    <div class="controls">
+        <button onclick="spawnCreatures()">10 Élőlény Generálása</button>
+    </div>
+
+    <div id="map-container">
+        <!-- A térképed -->
+        <img src="Alap_map.jpg" id="base-map" alt="Shear Map">
+        <!-- Ide kerülnek az ikonok JavaScript segítségével -->
+        <div id="icon-layer"></div>
     </div>
 
     <script>
-        const creatures = [
-            {
-                name: "Tyrant",
-                buff: "Elit Buff: Folyamatos életerő regeneráció"
-            },
-            {
-                name: "Megamouth",
-                
-                buff: "Elit Buff: Gyorsabb kasztképesség-töltődés"
-            },
-            {
-                name: "Mammoth Bird",
-                
-                buff: "Elit Buff: Megnövelt fegyverváltási- és töltési sebesség"
-            },
-            {
-                name: "Sloth",
-               
-                buff: "Elit Buff: Extra sebzés kiosztása"
-            },
-            {
-                name: "Trapjaw",
-               
-                buff: "Könnyű Préda: Gyors táplálékszerzés a Szörny számára"
-            },
-            {
-                name: "Armadon",
-                
-                buff: "Elit Buff: Jelentős sebzéscsökkentés"
-            },
-            {
-                name: "Nomad",
-             
-                buff: "Elit Buff: Gyorsabb Jetpack visszatöltődés a Vadászoknak"
+        // Néhány állat neve, hogy ha fölé viszed az egeret, kiírja
+        const creatureNames = ["Tyrant", "Megamouth", "Mammoth Bird", "Sloth", "Trapjaw", "Armadon", "Nomad"];
+
+        // Ez a függvény dönti el, hogy a véletlen koordináta a kék zónán belül van-e.
+        // Mivel a térkép nem szabályos, százalékos határokat adunk meg (X és Y 0-100% között).
+        function isValidSpawnArea(x, y) {
+            // Kizárjuk a fekete/üres részeket a térkép szélein
+            if (x < 10 || x > 90 || y < 10 || y > 95) return false; // Túl közel a szélekhez
+            if (x < 25 && y < 35) return false; // Bal felső üres sarok
+            if (x > 75 && y < 25) return false; // Jobb felső üres sarok
+            if (x < 25 && y > 75) return false; // Bal alsó üres sarok
+            if (x > 75 && y > 75) return false; // Jobb alsó üres sarok
+            if (x > 50 && x < 70 && y > 70) return false; // Alsó-középső öböl / kivágás
+            
+            return true; // Ha nem esik a fenti "fekete" zónákba, akkor jó a hely!
+        }
+
+        function spawnCreatures() {
+            const layer = document.getElementById("icon-layer");
+            layer.innerHTML = ""; // Letöröljük a korábbi ikonokat
+
+            let spawned = 0;
+
+            // Addig generálunk, amíg pontosan 10 darab nem lesz a pályán
+            while (spawned < 10) {
+                // Véletlen százalékos pozíció generálása (0-100%)
+                let randomX = Math.random() * 100;
+                let randomY = Math.random() * 100;
+
+                // Csak akkor rakjuk le, ha érvényes helyre esik a kék zónában
+                if (isValidSpawnArea(randomX, randomY)) {
+                    // Létrehozunk egy képet
+                    let img = document.createElement("img");
+                    img.src = "food.jpg";
+                    img.className = "food-icon";
+                    
+                    // Pozicionálás százalékosan a térképen
+                    img.style.left = randomX + "%";
+                    img.style.top = randomY + "%";
+
+                    // Véletlenszerű állatnév adása (ha fölé viszed az egeret, megmutatja)
+                    let randomName = creatureNames[Math.floor(Math.random() * creatureNames.length)];
+                    img.title = randomName + " (Élelem)";
+
+                    // Hozzáadjuk a térképhez
+                    layer.appendChild(img);
+                    
+                    spawned++; // Sikeres lerakás
+                }
             }
-        ];
-
-        function generateCreature() {
-            const randomIndex = Math.floor(Math.random() * creatures.length);
-            const selectedCreature = creatures[randomIndex];
-
-            document.getElementById("creature-name").innerText = selectedCreature.name;
-            document.getElementById("creature-desc").innerText = selectedCreature.desc;
-            document.getElementById("creature-buff").innerText = selectedCreature.buff;
         }
     </script>
 </body>
